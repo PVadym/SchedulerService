@@ -4,16 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
 
-/**
- * Created by Вадим on 27.09.2017.
- */
+
 @Entity
 @Table(name = "jobs")
-//@JsonRootName(value = "body")
 public class Job implements Serializable{
 
 
@@ -24,6 +22,7 @@ public class Job implements Serializable{
     private Long jobId;
 
     @Embedded
+    @Valid
     @JsonProperty("task")
     private Task task;
 
@@ -32,6 +31,7 @@ public class Job implements Serializable{
     private String type;
 
     @Column(name = "scheduled_at")
+    @JsonProperty("scheduled_at")
     private String scheduledAt;
 
     @Column(name = "execute_times")
@@ -96,11 +96,11 @@ public class Job implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
-    @JsonProperty("scheduled_at")
+
     public String getScheduledAt() {
         return scheduledAt;
     }
-    @JsonProperty("scheduled_at")
+
     public void setScheduledAt(String scheduledAt) {
         this.scheduledAt = scheduledAt;
     }
