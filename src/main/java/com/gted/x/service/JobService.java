@@ -13,4 +13,5 @@ public interface JobService {
     Job add (Job job);
     Job getById(long id);
     Job getByCallbackUrl(URL callBack);
+
 }

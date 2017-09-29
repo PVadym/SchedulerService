@@ -2,18 +2,16 @@ package com.gted.x.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Created by Вадим on 28.09.2017.
- */
-public class RequestBody {
+
+public class JobRequestBody {
 
     @JsonProperty("body")
     private Job job;
 
-    public RequestBody() {
+    public JobRequestBody() {
     }
 
-    public RequestBody(Job job) {
+    public JobRequestBody(Job job) {
     }
 
     public Job getJob() {
@@ -26,7 +24,7 @@ public class RequestBody {
 
     @Override
     public String toString() {
-        return "RequestBody{" +
+        return "JobRequestBody{" +
                 "job=" + job +
                 '}';
     }

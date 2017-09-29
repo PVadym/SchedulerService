@@ -44,4 +44,5 @@ public class JobServiceImp implements JobService{
     public Job getByCallbackUrl(URL callBack) {
         return repository.findByCallbackUrl(callBack);
     }
+
 }

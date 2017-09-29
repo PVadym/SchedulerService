@@ -12,9 +12,10 @@ import java.io.IOException;
 /**
  * Created by Вадим on 27.09.2017.
  */
-public class Solution {
+public class Test {
 
     static EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPATest");
+
     static EntityManager em = emf.createEntityManager();
 
     private static String path = "C:\\IdeaProjectProg\\SchedulerService\\src\\main\\java\\com\\gted\\x\\test.txt";

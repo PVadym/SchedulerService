@@ -1,25 +1,40 @@
 package com.gted.x.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Created by Вадим on 27.09.2017.
  */
 
-public class Response {
+public class Response<T> {
 
-    @JsonProperty("body")
-    private JobBody body;
 
-    public JobBody getBody() {
-        return body;
+    private Integer code;
+
+    private String message;
+
+
+    public Response() {
     }
 
-    public void setBody(JobBody body) {
-        this.body = body;
+    public Response(Integer code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
-    public Response(JobBody body) {
-        this.body = body;
+
+    public Integer getCode() {
+        return code;
     }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 }

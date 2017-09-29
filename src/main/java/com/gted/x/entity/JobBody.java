@@ -21,4 +21,5 @@ public class JobBody {
     public void setJob_Id(Long job_Id) {
         this.job_Id = job_Id;
     }
+
 }

@@ -12,4 +12,5 @@ import java.net.URL;
 public interface JobRepository extends CrudRepository<Job,Long> {
 
     Job findByCallbackUrl(URL callBack);
+
 }

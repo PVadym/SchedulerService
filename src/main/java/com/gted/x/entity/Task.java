@@ -4,26 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.net.URL;
 
-/**
- * Created by Вадим on 27.09.2017.
- */
+
 @Embeddable
 public class Task {
-
 
     @Column(name = "method")
     @Enumerated(value = EnumType.STRING)
     @JsonProperty("method")
     private RequestMethod  method;
 
-
     @Column(name = "url")
     @JsonProperty("url")
     private URL url;
 
     @Embedded
+    @Valid
     @JsonProperty("headers")
     private Headers headers;
 
