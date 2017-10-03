@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.persistence.*;
 import javax.validation.Valid;
-import java.net.URL;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 
 @Embeddable
@@ -18,7 +19,7 @@ public class Task {
 
     @Column(name = "url")
     @JsonProperty("url")
-    private URL url;
+    private String url;
 
     @Embedded
     @Valid
@@ -30,13 +31,18 @@ public class Task {
     private String data;
 
     public Task() {
+        this.headers = new Headers();
+        this.url = "";
+        this.data="";
+
     }
 
-    public Task(RequestMethod method, URL url, Headers headers, String data) {
-        this.method = method;
-        this.url = url;
-        this.headers = headers;
-        this.data = data;
+    public Task(RequestMethod method, String url, Headers headers, String data) {
+        this();
+        setMethod(method);
+        setUrl(url);
+        setHeaders(headers);
+        setData(data);
     }
 
     public RequestMethod getMethod() {
@@ -47,12 +53,12 @@ public class Task {
         this.method = method;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 
-    public void setUrl(URL url) {
-        this.url = url;
+    public void setUrl(String url) {
+        this.url = isNotBlank(url) ? url : "";
     }
 
     public Headers getHeaders() {
@@ -60,7 +66,7 @@ public class Task {
     }
 
     public void setHeaders(Headers headers) {
-        this.headers = headers;
+        this.headers = headers == null ? new Headers() : headers;
     }
 
     public String getData() {
@@ -68,7 +74,7 @@ public class Task {
     }
 
     public void setData(String data) {
-        this.data = data;
+        this.data = isNotBlank(data) ? data : "";
     }
 
     @Override

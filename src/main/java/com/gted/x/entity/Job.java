@@ -6,14 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.Date;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 
 @Entity
 @Table(name = "jobs")
 public class Job implements Serializable{
 
+    // Max Date: 9999-12-31 23:59:59
+    private static final Long FOREVER = 253402293599000L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,20 +60,48 @@ public class Job implements Serializable{
 
     @Column(name = "callback_url")
     @JsonProperty("callback_url")
-    private URL callbackUrl;
+    private String callbackUrl;
+
+    @Column(name = "next_run_at")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @JsonProperty("next_run_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date nextRunAt;
+
+    @Column(name = "last_run_at")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @JsonProperty("last_run_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastRunAt;
+
+    @Embedded
+    @Valid
+    @JsonProperty("last_run_result")
+    private Result lastRunResult;
 
     public Job() {
+        this.task = new Task();
+        this.type = "http";
+        this.scheduledAt = "";
+        this.executeTimes = 0;
+        this.startTime = new Date();
+        this.endTime = new Date(FOREVER);
+        this.timeZone = "Asia/Singapore";
+        this.callbackUrl = "";
+        this.lastRunResult = new Result();
+
     }
 
-    public Job(Task task, String type, String scheduledAt, int executeTimes, Date startTime, Date endTime, String timeZone, URL callbackUrl) {
-        this.task = task;
-        this.type = type;
-        this.scheduledAt = scheduledAt;
-        this.executeTimes = executeTimes;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.timeZone = timeZone;
-        this.callbackUrl = callbackUrl;
+    public Job(Task task, String type, String scheduledAt, int executeTimes, Date startTime, Date endTime, String timeZone, String callbackUrl) {
+        this();
+        setTask(task);
+        setType(type);
+        setScheduledAt(scheduledAt);
+        setExecuteTimes(executeTimes);
+        setStartTime(startTime);
+        setEndTime(endTime);
+        setTimeZone(timeZone);
+        setCallbackUrl(callbackUrl);
     }
 
     public Long getJobId() {
@@ -94,7 +125,7 @@ public class Job implements Serializable{
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.type = isNotBlank(type) ? type : "http";
     }
 
     public String getScheduledAt() {
@@ -102,7 +133,7 @@ public class Job implements Serializable{
     }
 
     public void setScheduledAt(String scheduledAt) {
-        this.scheduledAt = scheduledAt;
+        this.scheduledAt = isNotBlank(scheduledAt) ? scheduledAt : "";
     }
 
     public int getExecuteTimes() {
@@ -110,7 +141,7 @@ public class Job implements Serializable{
     }
 
     public void setExecuteTimes(int executeTimes) {
-        this.executeTimes = executeTimes;
+        this.executeTimes = executeTimes > 0 ? executeTimes : 0;
     }
 
     public Date getStartTime() {
@@ -118,7 +149,7 @@ public class Job implements Serializable{
     }
 
     public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+        this.startTime = startTime == null ? new Date() : startTime;
     }
 
     public Date getEndTime() {
@@ -126,7 +157,7 @@ public class Job implements Serializable{
     }
 
     public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+        this.endTime = endTime == null ? new Date(Long.MAX_VALUE) : endTime;
     }
 
     public String getTimeZone() {
@@ -134,15 +165,39 @@ public class Job implements Serializable{
     }
 
     public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
+        this.timeZone = isNotBlank(timeZone)? timeZone : "Asia/Singapore";
     }
 
-    public URL getCallbackUrl() {
+    public String getCallbackUrl() {
         return callbackUrl;
     }
 
-    public void setCallbackUrl(URL callbackUrl) {
-        this.callbackUrl = callbackUrl;
+    public void setCallbackUrl(String callbackUrl){
+        this.callbackUrl = isNotBlank(callbackUrl)? callbackUrl : "";
+    }
+
+    public Date getNextRunAt() {
+        return nextRunAt;
+    }
+
+    public void setNextRunAt(Date nextRunAt) {
+        this.nextRunAt = nextRunAt;
+    }
+
+    public Date getLastRunAt() {
+        return lastRunAt;
+    }
+
+    public void setLastRunAt(Date lastRunAt) {
+        this.lastRunAt = lastRunAt;
+    }
+
+    public Result getLastRunResult() {
+        return lastRunResult;
+    }
+
+    public void setLastRunResult(Result lastRunResult) {
+        this.lastRunResult = lastRunResult;
     }
 
     @Override

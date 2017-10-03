@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * Created by Вадим on 27.09.2017.
  */
@@ -24,12 +26,16 @@ public class Headers {
     private String authorization;
 
     public Headers() {
+        this.contentType = "application/json";
+        this.accept = "application/json";
+        this.authorization = "";
     }
 
     public Headers(String contentType, String accept, String authorization) {
-        this.contentType = contentType;
-        this.accept = accept;
-        this.authorization = authorization;
+        this();
+        setContentType(contentType);
+        setAccept(accept);
+        setAuthorization(authorization);
     }
 
     public String getContentType() {
@@ -37,7 +43,7 @@ public class Headers {
     }
 
     public void setContentType(String contentType) {
-        this.contentType = contentType;
+        this.contentType = isNotBlank(contentType) ? contentType : "application/json";
     }
 
     public String getAccept() {
@@ -45,7 +51,7 @@ public class Headers {
     }
 
     public void setAccept(String accept) {
-        this.accept = accept;
+        this.accept = isNotBlank(accept) ? accept : "application/json";
     }
 
     public String getAuthorization() {
@@ -53,7 +59,7 @@ public class Headers {
     }
 
     public void setAuthorization(String authorization) {
-        this.authorization = authorization;
+        this.authorization = isNotBlank(authorization) ? authorization : "";
     }
 
 
