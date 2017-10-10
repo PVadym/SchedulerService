@@ -2,6 +2,7 @@ package com.gted.x.controller;
 
 import com.gted.x.entity.Response;
 import com.gted.x.exception.EntityNotFoundException;
+import com.gted.x.exception.JobException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,5 +24,12 @@ public class ExceptionController {
     public Response handleNotFoundException(EntityNotFoundException e) {
         return new Response(HttpServletResponse.SC_NOT_FOUND,e.getMessage());
     }
+
+    @ExceptionHandler(JobException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response handleJobException(JobException e) {
+        return new Response(HttpServletResponse.SC_BAD_REQUEST,e.getMessage());
+    }
+
 
 }

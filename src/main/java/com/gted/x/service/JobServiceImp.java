@@ -1,12 +1,18 @@
 package com.gted.x.service;
 
-import com.gted.x.entity.Job;
+import com.gted.x.entity.JobEntity;
+import com.gted.x.entity.Result;
+import com.gted.x.exception.EntityNotFoundException;
+import com.gted.x.exception.JobException;
 import com.gted.x.repository.JobRepository;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URL;
+import java.util.Date;
+
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 /**
  * Created by Вадим on 27.09.2017.
@@ -14,35 +20,105 @@ import java.net.URL;
 @Service
 public class JobServiceImp implements JobService{
 
-    private final JobRepository repository;
+    private final JobRepository jobRepository;
+
+    private final Scheduler scheduler;
 
     @Autowired
-    public JobServiceImp(JobRepository repository) {
-        this.repository = repository;
+    public JobServiceImp(JobRepository jobRepository, Scheduler scheduler) {
+        this.jobRepository = jobRepository;
+        this.scheduler = scheduler;
     }
 
     @Override
     @Transactional
     public void delete(long id) {
-        repository.delete(id);
+        this.getById(id);
+        jobRepository.delete(id);
     }
 
     @Override
     @Transactional
-    public Job add(Job job) {
-        return repository.save(job);
+    public JobEntity add(JobEntity jobEntity) {
+        return jobRepository.save(jobEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Job getById(long id) {
-        return repository.findOne(id);
+    public JobEntity getById(long id) {
+        JobEntity jobEntity =  jobRepository.findOne(id);
+        if(jobEntity == null){
+            throw new EntityNotFoundException(String.format("jobEntity with ID %s not found", id));
+        }
+
+        return jobEntity;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Job getByCallbackUrl(URL callBack) {
-        return repository.findByCallbackUrl(callBack);
+    public JobEntity startJob(JobEntity jobEntity) {
+        JobEntity jobEntityToStart = this.add(jobEntity);
+        JobDetail job = createJob(jobEntityToStart.getJobId());
+
+        Date startTime = jobEntityToStart.getStartTime() == null
+                ? new Date() : jobEntityToStart.getStartTime();
+
+        Date endTime = jobEntityToStart.getEndTime() == null
+                ? new Date(253402293599000L) : jobEntityToStart.getEndTime();
+
+//        TimeZone timeZone = jobEntity.getTimeZone() == null
+//                ? TimeZone.getDefault() : TimeZone.getTimeZone(jobEntity.getTimeZone());
+
+
+        Trigger trigger = TriggerBuilder
+                .newTrigger()
+                .startAt(startTime)
+                .withSchedule(cronSchedule(jobEntityToStart.getScheduledAt()))
+                .endAt(endTime)
+                .build();
+
+        try {
+            scheduler.scheduleJob(job, trigger);
+
+        } catch (SchedulerException e) {
+            throw new JobException(e.getMessage());
+        }
+        return jobEntityToStart;
     }
+
+    private JobDetail createJob(long id) {
+        JobDataMap data = new JobDataMap();
+        data.put("repository", jobRepository);
+
+        return JobBuilder
+                .newJob(ScheduleJob.class)
+                .setJobData(data)
+                .withIdentity(String.valueOf(id))
+                .build();
+    }
+
+    public static class ScheduleJob implements Job {
+        @Override
+        public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+            JobDataMap data = jobExecutionContext.getJobDetail().getJobDataMap();
+            long id = Long.parseLong(jobExecutionContext.getJobDetail().getKey().getName());
+            JobRepository jobsRepository = (JobRepository) data.get("repository");
+
+            JobEntity jobEntity = jobsRepository.findOne(id);
+
+            Date nextRunAt = jobExecutionContext.getNextFireTime();
+            Date lastRunAt = jobExecutionContext.getPreviousFireTime();
+            Result result = new Result();
+            if(lastRunAt != null) {
+                result.setCode(200);
+                // result set body
+            }
+
+            jobEntity.setNextRunAt(nextRunAt);
+            jobEntity.setLastRunAt(lastRunAt);
+            jobEntity.setLastRunResult(result);
+            jobsRepository.save(jobEntity);
+//            sendCallback(jobEntity);
+        }
+    }
+
 
 }

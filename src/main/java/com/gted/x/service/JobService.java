@@ -1,8 +1,6 @@
 package com.gted.x.service;
 
-import com.gted.x.entity.Job;
-
-import java.net.URL;
+import com.gted.x.entity.JobEntity;
 
 /**
  * Created by Вадим on 27.09.2017.
@@ -10,8 +8,9 @@ import java.net.URL;
 public interface JobService {
 
     void delete (long id);
-    Job add (Job job);
-    Job getById(long id);
-    Job getByCallbackUrl(URL callBack);
+    JobEntity add (JobEntity jobEntity);
+    JobEntity getById(long id);
+    JobEntity startJob(JobEntity jobEntity);
+
 
 }

@@ -6,26 +6,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JobRequestBody {
 
     @JsonProperty("body")
-    private Job job;
+    private JobEntity jobEntity;
 
     public JobRequestBody() {
     }
 
-    public JobRequestBody(Job job) {
+    public JobRequestBody(JobEntity jobEntity) {
     }
 
-    public Job getJob() {
-        return job;
+    public JobEntity getJobEntity() {
+        return jobEntity;
     }
 
-    public void setJob(Job job) {
-        this.job = job;
+    public void setJobEntity(JobEntity jobEntity) {
+        this.jobEntity = jobEntity;
     }
 
     @Override
     public String toString() {
         return "JobRequestBody{" +
-                "job=" + job +
+                "jobEntity=" + jobEntity +
                 '}';
     }
 }

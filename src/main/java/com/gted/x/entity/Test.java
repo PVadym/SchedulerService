@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by Вадим on 27.09.2017.
@@ -19,7 +20,7 @@ public class Test {
     public static void main(String[] args) throws IOException, ParseException {
 //        ObjectMapper mapper = new ObjectMapper();
 //        mapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
-//        Job job = mapper.readValue(new FileReader(path),Job.class);
+//        JobEntity job = mapper.readValue(new FileReader(path),JobEntity.class);
 //        System.out.println(job);
 //        em.getTransaction().begin();
 //        em.persist(job);
@@ -34,6 +35,9 @@ public class Test {
         String str = format.format(date);
 
         System.out.println(new Date(253402293599000L));
+
+        System.out.println("=++++++++++++++++++++++++++++++++++++++");
+        System.out.println(TimeZone.getTimeZone("Asia/Singapore"));
 
 
 

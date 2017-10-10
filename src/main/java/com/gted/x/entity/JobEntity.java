@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Entity
 @Table(name = "jobs")
-public class Job implements Serializable{
+public class JobEntity implements Serializable{
 
     // Max Date: 9999-12-31 23:59:59
     private static final Long FOREVER = 253402293599000L;
@@ -79,30 +79,30 @@ public class Job implements Serializable{
     @JsonProperty("last_run_result")
     private Result lastRunResult;
 
-    public Job() {
-        this.task = new Task();
-        this.type = "http";
-        this.scheduledAt = "";
-        this.executeTimes = 0;
-        this.startTime = new Date();
-        this.endTime = new Date(FOREVER);
-        this.timeZone = "Asia/Singapore";
-        this.callbackUrl = "";
-        this.lastRunResult = new Result();
+//    public JobEntity() {
+//        this.task = new Task();
+//        this.type = "http";
+//        this.scheduledAt = "";
+//        this.executeTimes = 0;
+//        this.startTime = new Date();
+//        this.endTime = new Date(FOREVER);
+//        this.timeZone = "Asia/Singapore";
+//        this.callbackUrl = "";
+//        this.lastRunResult = new Result();
+//
+//    }
 
-    }
-
-    public Job(Task task, String type, String scheduledAt, int executeTimes, Date startTime, Date endTime, String timeZone, String callbackUrl) {
-        this();
-        setTask(task);
-        setType(type);
-        setScheduledAt(scheduledAt);
-        setExecuteTimes(executeTimes);
-        setStartTime(startTime);
-        setEndTime(endTime);
-        setTimeZone(timeZone);
-        setCallbackUrl(callbackUrl);
-    }
+//    public JobEntity(Task task, String type, String scheduledAt, int executeTimes, Date startTime, Date endTime, String timeZone, String callbackUrl) {
+//        this();
+//        setTask(task);
+//        setType(type);
+//        setScheduledAt(scheduledAt);
+//        setExecuteTimes(executeTimes);
+//        setStartTime(startTime);
+//        setEndTime(endTime);
+//        setTimeZone(timeZone);
+//        setCallbackUrl(callbackUrl);
+//    }
 
     public Long getJobId() {
         return jobId;
@@ -202,7 +202,7 @@ public class Job implements Serializable{
 
     @Override
     public String toString() {
-        return "Job{" +
+        return "JobEntity{" +
                 "jobId=" + jobId +
                 ", task=" + task +
                 ", type='" + type + '\'' +
