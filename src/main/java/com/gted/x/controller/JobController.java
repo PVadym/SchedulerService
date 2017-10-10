@@ -21,7 +21,6 @@ public class JobController {
     @SuppressWarnings("unchecked")
     public JobResponseBody<JobBody> createJob(@Valid @RequestBody JobRequestBody requestJobBody){
 
-       // JobEntity savedJobEntity = jobService.add(requestJobBody.getJobEntity());
         JobBody body = new JobBody(jobService.startJob(requestJobBody.getJobEntity()).getJobId());
         return new JobResponseBody<JobBody>(body);
     }
@@ -35,19 +34,8 @@ public class JobController {
     @DeleteMapping(value = "/jobs/{job_id}")
     @SuppressWarnings("unchecked")
     public Response delete(@PathVariable ("job_id") long id){
-        jobService.delete(id);
+        jobService.cancelJob(id);
         return new Response(200, "jod deleted successfully");
     }
 
-//    @PostMapping(value = "/jobs/{callbackUrl}")
-//    public ResponseEntity<JobEntity> getByCallbackUrl(@PathVariable("callbackUrl") String callbackUrl){
-//        JobEntity jobEntity = null;
-//        try {
-//            jobEntity = jobService.getByCallbackUrl(new URL(callbackUrl));
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(jobEntity);
-//        return ResponseEntity.ok(jobEntity);
-//    }
 }

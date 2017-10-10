@@ -11,6 +11,8 @@ public class Response<T> {
 
     private String message;
 
+    private JobCallBackEntity job;
+
 
     public Response() {
     }
@@ -18,6 +20,10 @@ public class Response<T> {
     public Response(Integer code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    public Response(JobCallBackEntity job) {
+        this.job = job;
     }
 
 
@@ -37,4 +43,11 @@ public class Response<T> {
         this.message = message;
     }
 
+    public JobCallBackEntity getJob() {
+        return job;
+    }
+
+    public void setJob(JobCallBackEntity job) {
+        this.job = job;
+    }
 }

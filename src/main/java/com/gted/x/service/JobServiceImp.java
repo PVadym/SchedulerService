@@ -1,6 +1,8 @@
 package com.gted.x.service;
 
+import com.gted.x.entity.JobCallBackEntity;
 import com.gted.x.entity.JobEntity;
+import com.gted.x.entity.Response;
 import com.gted.x.entity.Result;
 import com.gted.x.exception.EntityNotFoundException;
 import com.gted.x.exception.JobException;
@@ -9,8 +11,10 @@ import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
@@ -30,12 +34,6 @@ public class JobServiceImp implements JobService{
         this.scheduler = scheduler;
     }
 
-    @Override
-    @Transactional
-    public void delete(long id) {
-        this.getById(id);
-        jobRepository.delete(id);
-    }
 
     @Override
     @Transactional
@@ -54,6 +52,7 @@ public class JobServiceImp implements JobService{
         return jobEntity;
     }
 
+    @Override
     public JobEntity startJob(JobEntity jobEntity) {
         JobEntity jobEntityToStart = this.add(jobEntity);
         JobDetail job = createJob(jobEntityToStart.getJobId());
@@ -64,14 +63,14 @@ public class JobServiceImp implements JobService{
         Date endTime = jobEntityToStart.getEndTime() == null
                 ? new Date(253402293599000L) : jobEntityToStart.getEndTime();
 
-//        TimeZone timeZone = jobEntity.getTimeZone() == null
-//                ? TimeZone.getDefault() : TimeZone.getTimeZone(jobEntity.getTimeZone());
+        TimeZone timeZone = jobEntity.getTimeZone() == null
+                ? TimeZone.getDefault() : TimeZone.getTimeZone(jobEntity.getTimeZone());
 
 
         Trigger trigger = TriggerBuilder
                 .newTrigger()
                 .startAt(startTime)
-                .withSchedule(cronSchedule(jobEntityToStart.getScheduledAt()))
+                .withSchedule(cronSchedule(jobEntityToStart.getScheduledAt()).inTimeZone(timeZone))
                 .endAt(endTime)
                 .build();
 
@@ -82,6 +81,21 @@ public class JobServiceImp implements JobService{
             throw new JobException(e.getMessage());
         }
         return jobEntityToStart;
+    }
+
+    @Override
+    public void cancelJob(long id) {
+        try {
+            scheduler.deleteJob(new JobKey(String.valueOf(id)));
+        } catch (Exception ignored) {
+            throw new JobException();
+        }
+
+        JobEntity jobEntity = jobRepository.findOne(id);
+        if (jobEntity == null) throw new EntityNotFoundException(String.format("jobEntity with ID %s not found", id));
+        jobEntity.setLastRunResult(new Result(200,"CANCELED"));
+        jobRepository.save(jobEntity);
+        sendCallback(jobEntity);
     }
 
     private JobDetail createJob(long id) {
@@ -109,15 +123,22 @@ public class JobServiceImp implements JobService{
             Result result = new Result();
             if(lastRunAt != null) {
                 result.setCode(200);
-                // result set body
+                result.setBody("OK");
             }
 
             jobEntity.setNextRunAt(nextRunAt);
             jobEntity.setLastRunAt(lastRunAt);
             jobEntity.setLastRunResult(result);
             jobsRepository.save(jobEntity);
-//            sendCallback(jobEntity);
+            sendCallback(jobEntity);
         }
+    }
+
+    private static void sendCallback(JobEntity job) {
+        if (job.getCallbackUrl() == null) return;
+        RestTemplate template = new RestTemplate();
+        JobCallBackEntity callBackEntity = new JobCallBackEntity(job);
+        template.postForEntity(job.getCallbackUrl(), new Response(callBackEntity), Object.class);
     }
 
 

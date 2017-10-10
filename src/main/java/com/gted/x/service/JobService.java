@@ -7,10 +7,8 @@ import com.gted.x.entity.JobEntity;
  */
 public interface JobService {
 
-    void delete (long id);
     JobEntity add (JobEntity jobEntity);
     JobEntity getById(long id);
     JobEntity startJob(JobEntity jobEntity);
-
-
+    void cancelJob(long id);
 }
